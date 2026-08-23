@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en" data-root="{{ root }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Downloader — YouTube video &amp; transcript</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <span class="logo" aria-hidden="true"><span class="play"></span></span>
+    <h1>Downloader</h1>
+    <span class="tagline">video · audio · transcripts</span>
+  </header>
+
+  <main>
+    <section class="search">
+      <textarea id="urls" rows="3" spellcheck="false"
+                placeholder="Paste a YouTube link  (one per line for several)"></textarea>
+      <div class="search-actions">
+        <button type="button" class="pill ghost" id="paste">Paste</button>
+        <button type="button" class="pill primary" id="start">Download</button>
+      </div>
+    </section>
+
+    <div class="chips" id="modes" role="tablist">
+      <button type="button" class="chip selected" data-mode="video">Video + transcript</button>
+      <button type="button" class="chip" data-mode="audio">Audio only</button>
+      <button type="button" class="chip" data-mode="transcript">Transcript only</button>
+    </div>
+
+    <section class="card">
+      <h2>Settings</h2>
+      <div class="grid">
+        <label for="subfolder">Save to</label>
+        <div class="field">
+          <span class="prefix" title="{{ root }}">downloads/</span>
+          <input id="subfolder" type="text" placeholder="(optional subfolder)" autocomplete="off">
+        </div>
+
+        <label for="quality">Max quality</label>
+        <div class="field">
+          <select id="quality">
+            {% for q in qualities %}
+            <option value="{{ q }}" {% if q == '1080' %}selected{% endif %}>{{ q }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <label for="audio_format">Audio format</label>
+        <div class="field">
+          <select id="audio_format" disabled>
+            {% for f in audio_formats %}
+            <option value="{{ f }}">{{ f }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <label for="lang">Caption langs</label>
+        <div class="field">
+          <input id="lang" type="text" value="en" autocomplete="off">
+        </div>
+
+        <label for="browser">Cookies from</label>
+        <div class="field">
+          <select id="browser">
+            {% for b in browsers %}
+            <option value="{{ b }}">{{ b or '—' }}</option>
+            {% endfor %}
+          </select>
+          <span class="hint">a browser profile on the server</span>
+        </div>
+
+        <label for="cookies">cookies.txt</label>
+        <div class="field">
+          <input id="cookies" type="file" accept=".txt">
+          <span class="hint">use this on a headless server</span>
+        </div>
+      </div>
+
+      <div class="toggles">
+        <label><input type="checkbox" id="transcript" checked> Get transcript</label>
+        <label><input type="checkbox" id="timestamps"> Timestamps</label>
+        <label><input type="checkbox" id="keep_vtt"> Keep raw .vtt</label>
+        <label><input type="checkbox" id="playlist"> Whole playlist</label>
+      </div>
+    </section>
+
+    <section class="actions">
+      <div class="progress"><div class="bar" id="bar"></div></div>
+      <span class="status" id="status">Ready</span>
+      <button type="button" class="pill ghost" id="copy" disabled>Copy transcript</button>
+      <button type="button" class="pill ghost" id="cancel" disabled>Cancel</button>
+    </section>
+
+    <section class="card grow">
+      <h2>Activity</h2>
+      <pre id="log" class="log"></pre>
+    </section>
+
+    <section class="card">
+      <div class="card-head">
+        <h2>Files</h2>
+        <button type="button" class="pill ghost small" id="refresh">Refresh</button>
+      </div>
+      <ul id="files" class="files"><li class="empty">Nothing downloaded yet.</li></ul>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

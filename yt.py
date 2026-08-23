@@ -272,7 +272,12 @@ def fetch_captions(url: str, args, outdir: Path, log, sleep=time.sleep):
             if language not in langs:
                 log(f"  transcript -> no {'/'.join(langs)} captions, using '{language}'")
 
-            options = tracks[language]
+            # YouTube lists an HLS-delivered "vtt" track first for auto
+            # captions; its URL is a .m3u8 manifest, not caption text. The
+            # plain timedtext URLs are the ones that return something to parse.
+            options = [
+                t for t in tracks[language] if "m3u8" not in (t.get("protocol") or "")
+            ] or tracks[language]
             track = next((t for t in options if t.get("ext") == "vtt"), options[0])
             stem = Path(ydl.prepare_filename(info)).stem
 
